@@ -1,0 +1,175 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Binder MTG</title>
+<meta name="description" content="Katalog kolekcji Magic: The Gathering ze skanerem kart i budowaniem decków do Standardu.">
+<meta name="theme-color" content="#18202C">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://api.scryfall.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Alegreya+SC:wght@500;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<header class="top">
+  <div class="top-row">
+    <div class="brand">Binder MTG<small>kolekcja · skaner · decki</small></div>
+    <nav class="tabs" role="tablist" aria-label="Sekcje">
+      <button class="tab" role="tab" data-tab="cat" aria-selected="true">Katalog</button>
+      <button class="tab" role="tab" data-tab="scan" aria-selected="false">Skaner</button>
+      <button class="tab" role="tab" data-tab="coll" aria-selected="false">Kolekcja<span class="n" id="n-own">0</span></button>
+      <button class="tab" role="tab" data-tab="deck" aria-selected="false">Deck</button>
+      <button class="tab icon" role="tab" data-tab="set" aria-selected="false" aria-label="Ustawienia" title="Ustawienia"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="3.2"/><path d="M12 2.8v2.4M12 18.8v2.4M4.6 4.6l1.7 1.7M17.7 17.7l1.7 1.7M2.8 12h2.4M18.8 12h2.4M4.6 19.4l1.7-1.7M17.7 6.3l1.7-1.7"/></svg></button>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <!-- CATALOG -->
+  <section id="v-cat">
+    <div class="rail" id="cat-rail"></div>
+    <div class="filters">
+      <input class="search" id="cat-q" type="search" placeholder="Szukaj kart: nazwa lub składnia Scryfall (np. t:dragon c:r)" autocomplete="off">
+      <select class="sel" id="cat-setsel" aria-label="Wybierz edycję"></select>
+      <select class="sel" id="cat-sort" aria-label="Sortowanie">
+        <option value="set">Wg numeru</option><option value="name">Wg nazwy</option><option value="cmc">Wg kosztu</option><option value="rarity">Wg rzadkości</option><option value="price">Wg ceny</option>
+      </select>
+      <label class="chk"><input type="checkbox" id="cat-std"> Tylko legalne w Standardzie</label>
+      <label class="chk"><input type="checkbox" id="cat-var"> Warianty i promki</label>
+      <span class="count" id="cat-status"></span>
+    </div>
+    <p class="hint">Stuknij kartę, żeby dodać egzemplarz. <b>−</b> odejmuje, <b>i</b> pokazuje szczegóły i wszystkie wydruki.</p>
+    <div class="grid" id="cat-grid"></div>
+    <button class="more" id="cat-more" hidden>Pokaż więcej</button>
+  </section>
+
+  <!-- SCANNER -->
+  <section id="v-scan" hidden>
+    <div class="sect">
+      <h3>Skaner kart</h3>
+      <p class="sub">Rozłóż karty obok siebie i zrób zdjęcie. Skaner znajdzie każdą kartę, odczyta jej nazwę i edycję, a Ty zaakceptujesz wynik przed dodaniem do kolekcji. Możesz wrzucić wiele zdjęć naraz.</p>
+      <div class="shoot" id="s-drop">
+        <label class="big" for="s-cam"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8.5A2.5 2.5 0 0 1 5.5 6h1.8l1.4-2h6.6l1.4 2h1.8A2.5 2.5 0 0 1 21 8.5v9a2.5 2.5 0 0 1-2.5 2.5h-13A2.5 2.5 0 0 1 3 17.5z"/><circle cx="12" cy="13" r="3.6"/></svg>Zrób zdjęcie<span>otwiera aparat telefonu</span></label>
+        <input id="s-cam" type="file" accept="image/*" capture="environment">
+        <label class="big" for="s-pick"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2.5"/><circle cx="9" cy="10" r="1.8"/><path d="m21 16-5-5-9 9"/></svg>Wybierz zdjęcia<span>z galerii lub dysku, albo przeciągnij tutaj</span></label>
+        <input id="s-pick" type="file" accept="image/*" multiple>
+      </div>
+      <div class="opts3">
+        <div><label class="l" for="s-engine">Silnik rozpoznawania</label>
+          <select class="sel" id="s-engine"><option value="local">OCR w przeglądarce (darmowy)</option><option value="claude">Claude Vision (Twój klucz API)</option></select></div>
+        <div><label class="l" for="s-layout">Układ kart na zdjęciu</label>
+          <select class="sel" id="s-layout"><option value="auto">Wykryj automatycznie</option><option value="1x1">1 karta</option><option value="2x2">Siatka 2 × 2</option><option value="3x3">Siatka 3 × 3</option><option value="3x4">Siatka 3 × 4 (3 rzędy)</option><option value="4x3">Siatka 4 × 3 (4 rzędy)</option><option value="4x4">Siatka 4 × 4</option><option value="4x5">Siatka 4 × 5 (4 rzędy)</option><option value="5x4">Siatka 5 × 4 (5 rzędów)</option></select></div>
+        <div><label class="l">Edycja i numer</label><label class="chk"><input type="checkbox" id="s-readset"> Odczytuj kod edycji (dokładniej, trochę wolniej)</label></div>
+      </div>
+      <details class="tips"><summary>Jak zrobić dobre zdjęcie</summary>
+        <ul><li>Połóż karty na gładkim, kontrastowym tle (np. jednolity blat), z małymi odstępami.</li>
+          <li>Rób zdjęcie prosto z góry, przy dobrym świetle, bez odblasków na foliach.</li>
+          <li>Najlepiej 9–16 kart na zdjęciu. Im mniej kart, tym większe litery i pewniejszy odczyt.</li>
+          <li>W trybie siatki wykadruj zdjęcie tak, żeby karty wypełniały cały kadr.</li>
+          <li>Nie fotografuj tych samych kart dwa razy – każde zdjęcie liczy się jako osobne egzemplarze.</li></ul></details>
+      <div class="photos" id="s-photos"></div>
+      <div class="row" style="margin-top:14px">
+        <button class="btn pri" id="s-go" disabled>Odczytaj karty</button>
+        <button class="btn" id="s-stop" hidden>Zatrzymaj</button>
+      </div>
+      <div class="status" id="s-status"></div>
+    </div>
+    <div class="sect" id="s-rev" hidden>
+      <div class="row" style="justify-content:space-between">
+        <div><h3>Wyniki do akceptacji</h3><span class="meta" id="s-count"></span></div>
+        <div class="row"><button class="btn" id="s-all">Zaznacz / odznacz</button><button class="btn" id="s-clear">Wyczyść</button><button class="btn pri" id="s-accept">Akceptuj i dodaj do kolekcji</button></div>
+      </div>
+      <p class="sub">Po lewej fragment Twojego zdjęcia, obok rozpoznana karta. Popraw nazwę, jeśli się nie zgadza (podpowiedzi pojawią się podczas pisania), albo wybierz jedną z propozycji.</p>
+      <div class="scroll"><table class="clist revtab" id="s-revtab"></table></div>
+      <datalist id="s-names"></datalist>
+    </div>
+  </section>
+
+  <!-- COLLECTION -->
+  <section id="v-coll" hidden>
+    <div class="stats" id="c-stats"></div>
+    <div class="sect">
+      <div class="filters" style="padding:0 0 12px">
+        <input class="search" id="c-q" type="search" placeholder="Szukaj w kolekcji" autocomplete="off">
+        <select class="sel" id="c-filter" aria-label="Filtr"><option value="">Wszystkie</option><option value="legal">Legalne w Standardzie</option><option value="banned">Zbanowane</option><option value="not_legal">Poza Standardem</option></select>
+        <select class="sel" id="c-sort" aria-label="Sortowanie"><option value="name">Nazwa</option><option value="set">Edycja</option><option value="added">Ostatnio dodane</option><option value="cmc">Koszt</option><option value="price">Cena</option></select>
+      </div>
+      <div id="c-list" class="clistv"></div>
+    </div>
+    <div class="sect">
+      <h3>Kopia zapasowa i import</h3>
+      <p class="sub">Kolekcja jest zapisana w tej przeglądarce. Żeby przenieść ją na inne urządzenie, pobierz kopię i wczytaj ją tam. Możesz też wkleić listę z innej aplikacji (format „4 Nazwa” lub eksport z Arena/Moxfield).</p>
+      <div class="row">
+        <button class="btn" id="c-exp-json">Pobierz kopię (JSON)</button>
+        <button class="btn" id="c-exp-csv">Eksport CSV</button>
+        <button class="btn" id="c-copy">Kopiuj jako listę</button>
+        <label class="btn" for="c-imp-file">Wczytaj plik…</label><input type="file" id="c-imp-file" accept=".json,.txt,.csv,application/json,text/plain,text/csv" hidden>
+        <label class="chk"><input type="checkbox" id="c-imp-merge" checked> dodaj do obecnej kolekcji</label>
+        <button class="btn" id="c-refresh">Odśwież legalność i ceny</button>
+      </div>
+      <textarea id="c-imp-text" class="inp ta" rows="4" placeholder="4 Old Thrush&#10;2 Wood Elves (HOB) 99&#10;1 Llanowar Elves"></textarea>
+      <div class="row"><button class="btn pri" id="c-imp-go">Importuj listę</button><span class="status" id="c-imp-status"></span></div>
+    </div>
+  </section>
+
+  <!-- DECK -->
+  <section id="v-deck" hidden>
+    <div class="sect">
+      <h3>Silnik decków</h3>
+      <p class="sub">Silnik ocenia każdą Twoją kartę legalną w Standardzie (siła, koszt, usuwanie, dobieranie, synergie), sprawdza wszystkie kombinacje kolorów i archetypy i składa najmocniejszy deck z krzywą many i bazą lądów. Używa tylko kart, które masz, w liczbie, którą masz.</p>
+      <p class="meta" id="d-pool"></p>
+      <div class="opts3">
+        <div><label class="l" for="d-size">Rozmiar</label><select class="sel" id="d-size"><option value="60">60 kart (Constructed)</option><option value="40">40 kart (Limited / prerelease)</option></select></div>
+        <div><label class="l" for="d-style">Styl</label><select class="sel" id="d-style"><option value="auto">Najsilniejszy (auto)</option><option value="aggro">Aggro</option><option value="midrange">Midrange</option><option value="control">Control</option></select></div>
+        <div><label class="l">Kolory (opcjonalnie)</label><div class="pips" id="d-pips"></div></div>
+        <div><label class="l" for="d-engine">Silnik</label><select class="sel" id="d-engine"><option value="local">Wbudowany (darmowy, offline)</option><option value="claude">Claude AI (Twój klucz API)</option></select></div>
+        <div><label class="l">Opcje</label>
+          <label class="chk"><input type="checkbox" id="d-bo3" checked> Sideboard 15 kart (Bo3)</label>
+          <label class="chk"><input type="checkbox" id="d-basics" checked> Dowolna liczba lądów podstawowych</label></div>
+      </div>
+      <div class="row"><button class="btn pri" id="d-build">Zbuduj najlepszy deck</button><button class="btn" id="d-stop" hidden>Zatrzymaj</button></div>
+      <div class="status" id="d-status"></div>
+      <div id="d-saved" class="savedlist"></div>
+    </div>
+    <div id="d-out"></div>
+  </section>
+
+  <!-- SETTINGS -->
+  <section id="v-set" hidden>
+    <div class="sect">
+      <h3>Claude AI (opcjonalnie)</h3>
+      <p class="sub">Z własnym kluczem API Claude możesz budować decki przez AI i czytać zdjęcia przez Claude Vision (dokładniej niż OCR, zwłaszcza przy foliach i nietypowych ramkach). Klucz zapisuje się tylko w tej przeglądarce i jest wysyłany wyłącznie do api.anthropic.com. Zapytania są płatne z Twojego konta API. Klucz utworzysz na console.anthropic.com.</p>
+      <div class="opts3">
+        <div><label class="l" for="set-key">Klucz API</label><input class="inp" id="set-key" type="password" autocomplete="off" placeholder="sk-ant-…"></div>
+        <div><label class="l" for="set-model">Model</label><input class="inp" id="set-model" type="text" placeholder="claude-sonnet-5"></div>
+      </div>
+      <div class="row"><button class="btn pri" id="set-save">Zapisz</button><button class="btn" id="set-test">Sprawdź połączenie</button><button class="btn" id="set-forget">Usuń klucz</button><span class="status" id="set-status"></span></div>
+    </div>
+    <div class="sect">
+      <h3>Dane</h3>
+      <p class="sub">Wszystko (kolekcja, zapisane decki, ustawienia) jest przechowywane lokalnie w tej przeglądarce. Wyczyszczenie danych przeglądarki usuwa kolekcję, więc rób kopie zapasowe w zakładce Kolekcja.</p>
+      <button class="btn danger" id="set-wipe-confirm">Wyczyść kolekcję…</button>
+      <div class="warnbox" id="set-wipe-box" hidden>Na pewno usunąć całą kolekcję i zapisane decki? Tego nie da się cofnąć.
+        <div class="row" style="margin-top:8px"><button class="btn danger" id="set-wipe-yes">Tak, usuń</button><button class="btn" id="set-wipe-no">Anuluj</button></div></div>
+    </div>
+    <p class="legal">Binder MTG to nieoficjalna aplikacja fanowska dozwolona przez Fan Content Policy Wizards of the Coast. Nie jest zatwierdzona ani wspierana przez Wizards. Części materiałów są własnością Wizards of the Coast. ©Wizards of the Coast LLC. Dane kart, ceny i obrazy: <a href="https://scryfall.com" target="_blank" rel="noopener">Scryfall</a>. OCR: Tesseract.js, wykrywanie kart: OpenCV.js.</p>
+  </section>
+</main>
+
+<div class="drawer" id="drawer" hidden><div class="pane" id="pane" role="dialog" aria-modal="true" aria-label="Szczegóły karty"></div></div>
+
+<script src="js/util.js"></script>
+<script src="js/scryfall.js"></script>
+<script src="js/names.js"></script>
+<script src="js/collection.js"></script>
+<script src="js/catalog.js"></script>
+<script src="js/scanner.js"></script>
+<script src="js/deckengine.js"></script>
+<script src="js/claude.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
